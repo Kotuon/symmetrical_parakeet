@@ -31,11 +31,21 @@ void UJump::Start( const FInputActionValue &value ) {
         return;
 
     if ( start_jump_velocity > 0 ) {
-        parent->PlayAnimMontage( running_jump_animation );
+        if ( IsValid( running_jump_animation ) ) {
+            parent->PlayAnimMontage( running_jump_animation );
+        }
+        else {
+            JumpTakeOff();
+        }
         return;
     }
 
-    parent->PlayAnimMontage( standing_jump_animation );
+    if ( IsValid( standing_jump_animation ) ) {
+        parent->PlayAnimMontage( standing_jump_animation );
+    }
+    else {
+        JumpTakeOff();
+    }
 }
 
 void UJump::End() {

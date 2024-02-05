@@ -37,9 +37,6 @@ public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "General" )
     float jump_velocity = 420.f;
 
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "General" )
-    float wall_jump_modifier = 4.f;
-
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "General|Jump Memory" )
     float jump_memory_time = 0.25f;
 

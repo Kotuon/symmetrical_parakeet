@@ -61,9 +61,6 @@ void UJump::JumpTakeOff() {
     xy_direction = ( parent->gimbal->GetForwardVector() * last_movement_input.Y ) + ( parent->gimbal->GetRightVector() * last_movement_input.X );
     xy_direction.Normalize();
 
-    GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Green, up_direction.ToString() );
-    GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Red, parent->GetActorUpVector().ToString() );
-
     FVector jump_direction = ( up_direction * jump_velocity ) + ( xy_direction * start_jump_velocity );
 
     parent->LaunchCharacter( jump_direction, true, true );

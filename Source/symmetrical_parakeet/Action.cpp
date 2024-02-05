@@ -44,8 +44,6 @@ void UAction::Print() const {
         name += "None";
     else if ( type == EAction::A_Jump )
         name += "Jump";
-    else if ( type == EAction::A_WallRun )
-        name += "WallRun";
 
     GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Cyan, FString( "Found: " + name + " : " + FString::FromInt( uint8( type ) ) ) );
 }

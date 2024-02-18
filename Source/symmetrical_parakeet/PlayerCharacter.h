@@ -32,8 +32,12 @@ public: // Functions
     UFUNCTION( BlueprintCallable )
     void SetCanWalk( bool canWalk );
 
+    bool GetCanWalk() const;
+
     UFUNCTION( BlueprintCallable )
-    const FVector2D &GetLastMovementInput() const;
+    const FVector &GetLastMovementInput() const;
+
+    void SetLastMovementZInput( const float input_value );
 
 public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Actions" )
@@ -72,6 +76,8 @@ private: // Functions
     void UpdateCameraRotation();
 
 private: // Variables
+    UCharacterMovementComponent *character_movement;
+
     FTimerHandle camera_rotation_time_handle;
     FRotator new_camera_rotation;
     FRotator old_camera_rotation;
@@ -80,7 +86,7 @@ private: // Variables
     FRotator new_player_rotation;
     FRotator old_player_rotation;
 
-    FVector2D last_movement_input;
+    FVector last_movement_input;
 
     float timeSinceRotateStarted = 0.f;
 

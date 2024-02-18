@@ -15,6 +15,8 @@ void USmartSpringArm::BeginPlay() {
 
     gimbal = parents[0];
 
+    gimbal->SetWorldRotation( parent->GetActorRotation() );
+
     TargetArmLength = lerpPoints[0];
 }
 
@@ -28,7 +30,7 @@ void USmartSpringArm::TickComponent( float DeltaTime, enum ELevelTick TickType, 
     if ( !IsValid( parent ) )
         return;
 
-    if ( parent->GetVelocity().Length() > 0 ) {
+    if ( parent->GetVelocity().Length() > startVelocity ) {
         currTime = FMath::Clamp( currTime + DeltaTime, 0, lerpTime );
     } else {
         currTime = FMath::Clamp( currTime - DeltaTime, 0, lerpTime );

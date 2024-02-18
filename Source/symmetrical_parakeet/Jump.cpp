@@ -18,6 +18,12 @@ void UJump::BeginPlay() {
 }
 
 void UJump::Start( const FInputActionValue &value ) {
+    if ( value.Get< bool >() ) {
+        parent->SetLastMovementZInput( 1.f );
+    } else {
+        parent->SetLastMovementZInput( 0.f );
+    }
+
     if ( has_jumped ) {
         jump_memory = true;
         parent->GetWorldTimerManager().SetTimer( jump_memory_handle, this, &UJump::ResetJumpMemory, 0.1f, false, jump_memory_time );
@@ -27,14 +33,14 @@ void UJump::Start( const FInputActionValue &value ) {
 
     start_jump_velocity = parent->GetVelocity().Length();
 
-    if ( !manager->StartAction( type ) )
+    if ( !manager->StartAction( type ) ) {
         return;
+    }
 
     if ( start_jump_velocity > 0 ) {
         if ( IsValid( running_jump_animation ) ) {
             parent->PlayAnimMontage( running_jump_animation );
-        }
-        else {
+        } else {
             JumpTakeOff();
         }
         return;
@@ -42,8 +48,7 @@ void UJump::Start( const FInputActionValue &value ) {
 
     if ( IsValid( standing_jump_animation ) ) {
         parent->PlayAnimMontage( standing_jump_animation );
-    }
-    else {
+    } else {
         JumpTakeOff();
     }
 }
@@ -53,10 +58,10 @@ void UJump::End() {
 }
 
 void UJump::JumpTakeOff() {
-    FVector up_direction = parent->GetCapsuleComponent()->GetUpVector();
+    const FVector up_direction = parent->GetCapsuleComponent()->GetUpVector();
     FVector xy_direction = FVector( 0 );
 
-    FVector2D last_movement_input = parent->GetLastMovementInput();
+    const FVector last_movement_input = parent->GetLastMovementInput();
 
     xy_direction = ( parent->gimbal->GetForwardVector() * last_movement_input.Y ) + ( parent->gimbal->GetRightVector() * last_movement_input.X );
     xy_direction.Normalize();

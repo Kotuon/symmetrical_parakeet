@@ -15,6 +15,8 @@ APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer 
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
+    character_movement = GetCharacterMovement();
+
     action_manager = Cast< UActionManager >( CreateDefaultSubobject< UActionManager >( FName( "ActionManager" ) ) );
 
     gimbal = Cast< USceneComponent >( CreateDefaultSubobject< USceneComponent >( FName( "Gimbal" ) ) );
@@ -42,33 +44,20 @@ void APlayerCharacter::BeginPlay() {
 void APlayerCharacter::Tick( float DeltaTime ) {
     Super::Tick( DeltaTime );
 
+    if ( character_movement->MovementMode == MOVE_Falling || character_movement->MovementMode == MOVE_Flying ) {
+        const FVector curr_velocity = GetVelocity();
 
-
-    // FHitResult hit_result;
-    // const FQuat camera_rotation = FNinjaMath::MakeFromZQuat(GetActorUpVector(), gimbal->GetComponentQuat() );
-    // GetNinjaCharacterMovement()->SafeMoveUpdatedComponent(FVector::ZeroVector, camera_rotation, false, hit_result, ETeleportType::TeleportPhysics);
-
-
-
-
-    // FRotator gimbal_rotation_yaw = FRotator{ 0.0, gimbal->GetComponentRotation().Yaw, 0.0 };
-    // FVector world_forward = UKismetMathLibrary::GetForwardVector( gimbal_rotation_yaw );
-    // FVector world_right = UKismetMathLibrary::GetRightVector( gimbal_rotation_yaw );
-
-    // FVector up = GetNinjaCharacterMovement()->GetComponentAxisZ();
-
-    // FVector a1 = FVector::VectorPlaneProject( world_forward, up );
-    // FVector a2 = FVector::VectorPlaneProject( world_right, up );
-
-    // DrawDebugLine( GetWorld(), GetActorLocation(), GetActorLocation() + ( a1 * 100.f ), FColor::Green, false, 0.f, ( uint8 )0U, 5.f );
-    // DrawDebugLine( GetWorld(), GetActorLocation(), GetActorLocation() + ( a2 * 100.f ), FColor::Red, false, 0.f, ( uint8 )0U, 2.f );
-    // DrawDebugLine( GetWorld(), GetActorLocation(), GetActorLocation() + ( up * 100.f ), FColor::Yellow, false, 0.f, ( uint8 )0U, 2.f );
+        // if ( curr_velocity.Z < 0.f ) {
+            const FRotator new_rotation = curr_velocity.Rotation();
+            SetActorRotation( new_rotation );
+        // }
+    }
 }
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent( UInputComponent *PlayerInputComponent ) {
     // Get the player controller
-    APlayerController *pc = Cast< APlayerController >( GetController() );
+    const APlayerController *pc = Cast< APlayerController >( GetController() );
 
     // Get the local player subsystem
     UEnhancedInputLocalPlayerSubsystem *Subsystem = ULocalPlayer::GetSubsystem< UEnhancedInputLocalPlayerSubsystem >( pc->GetLocalPlayer() );
@@ -92,36 +81,31 @@ void APlayerCharacter::SetupPlayerInputComponent( UInputComponent *PlayerInputCo
 }
 
 void APlayerCharacter::Move( const FInputActionValue &value ) {
-    FVector2D input_value = value.Get< FVector2D >();
-    last_movement_input = input_value;
+    const FVector2D input_value = value.Get< FVector2D >();
+    last_movement_input = FVector( input_value.X, input_value.Y, 0.f );
 
     if ( !can_walk )
         return;
 
-    FRotator gimbal_rotation_yaw = FRotator{ 0.0, gimbal->GetComponentRotation().Yaw, 0.0 };
-    FVector world_forward = UKismetMathLibrary::GetForwardVector( gimbal_rotation_yaw );
-    FVector world_right = UKismetMathLibrary::GetRightVector( gimbal_rotation_yaw );
-
-    // FVector up = GetActorUpVector();//GetNinjaCharacterMovement()->GetComponentAxisZ();
-
-    // AddMovementInput( FVector::VectorPlaneProject( world_forward, up ), input_value.Y );
-    // AddMovementInput( FVector::VectorPlaneProject( world_right, up ), input_value.X );
+    const FRotator gimbal_rotation_yaw = FRotator{ 0.0, gimbal->GetComponentRotation().Yaw, 0.0 };
+    const FVector world_forward = UKismetMathLibrary::GetForwardVector( gimbal_rotation_yaw );
+    const FVector world_right = UKismetMathLibrary::GetRightVector( gimbal_rotation_yaw );
 
     AddMovementInput( world_forward, input_value.Y );
     AddMovementInput( world_right, input_value.X );
 }
 
 void APlayerCharacter::Look( const FInputActionValue &value ) {
-    FVector2D input_value = value.Get< FVector2D >();
+    const FVector2D input_value = value.Get< FVector2D >();
 
     // FRotator new_yaw = GetActorRightVector().Rotation() * input_value.X * sensitivity * 0.01f;
-    FRotator new_yaw{ 0.0, input_value.X * sensitivity, 0.0 };
+    const FRotator new_yaw{ 0.0, input_value.X * sensitivity, 0.0 };
     gimbal->AddWorldRotation( new_yaw );
 
-    float input_pitch = spring_arm->GetRelativeRotation().Pitch + ( input_value.Y * sensitivity );
-    float clamped_pitch = FMath::Clamp( input_pitch, -89, 90 );
+    const float input_pitch = spring_arm->GetRelativeRotation().Pitch + ( input_value.Y * sensitivity );
+    const float clamped_pitch = FMath::Clamp( input_pitch, -89, 90 );
 
-    FRotator new_pitch{ clamped_pitch, 0.0, 0.0 };
+    const FRotator new_pitch{ clamped_pitch, 0.0, 0.0 };
     spring_arm->SetRelativeRotation( new_pitch );
 }
 
@@ -134,14 +118,14 @@ void APlayerCharacter::StartPlayerRotation() {
 
 void APlayerCharacter::UpdatePlayerRotation() {
     timeSinceRotateStarted += 0.01f;
-    float t = timeSinceRotateStarted / 0.15f;
+    const float t = timeSinceRotateStarted / 0.15f;
 
     if ( t > 1.f ) {
         GetWorldTimerManager().ClearTimer( player_rotation_time_handle );
         return;
     }
 
-    FRotator new_rotation = FQuat::Slerp( old_player_rotation.Quaternion(), new_player_rotation.Quaternion(), t ).Rotator();
+    const FRotator new_rotation = FQuat::Slerp( old_player_rotation.Quaternion(), new_player_rotation.Quaternion(), t ).Rotator();
     SetActorRotation( new_rotation );
 }
 
@@ -149,17 +133,25 @@ void APlayerCharacter::SetCanWalk( bool canWalk ) {
     can_walk = canWalk;
 }
 
-const FVector2D &APlayerCharacter::GetLastMovementInput() const {
+bool APlayerCharacter::GetCanWalk() const {
+    return can_walk;
+}
+
+const FVector &APlayerCharacter::GetLastMovementInput() const {
     return last_movement_input;
+}
+
+void APlayerCharacter::SetLastMovementZInput( const float input_value ) {
+    last_movement_input.Z = input_value;
 }
 
 void APlayerCharacter::UpdateCameraRotation() {
     old_camera_rotation = FRotator( spring_arm->GetRelativeRotation().Pitch, gimbal->GetComponentRotation().Yaw, 0.0 );
     new_camera_rotation = GetActorRotation();
 
-    FRotator new_rotation = FQuat::Slerp( old_camera_rotation.Quaternion(), new_camera_rotation.Quaternion(), 0.05f ).Rotator();
-    FRotator new_yaw{ 0.0, new_rotation.Yaw, 0.0 };
-    FRotator new_pitch{ new_rotation.Pitch, 0.0, 0.0 };
+    const FRotator new_rotation = FQuat::Slerp( old_camera_rotation.Quaternion(), new_camera_rotation.Quaternion(), 0.05f ).Rotator();
+    const FRotator new_yaw{ 0.0, new_rotation.Yaw, 0.0 };
+    const FRotator new_pitch{ new_rotation.Pitch, 0.0, 0.0 };
     gimbal->SetWorldRotation( new_yaw );
     spring_arm->SetRelativeRotation( new_pitch );
 }

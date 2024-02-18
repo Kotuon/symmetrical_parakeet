@@ -4,6 +4,7 @@
 #include "ActionManager.h"                            // UActionManager class
 #include "PlayerCharacter.h"                          // APlayerCharacter class
 #include "GameFramework/CharacterMovementComponent.h" // UCharacterMovementComponent class
+#include "Camera/CameraComponent.h"                   // UCameraComponent class
 
 UFlight::UFlight() {
     type = EAction::A_Flight;
@@ -23,6 +24,10 @@ void UFlight::Start( const FInputActionValue &value ) {
         return;
     }
 
+    if ( !parent->GetCanWalk() ) {
+        return;
+    }
+
     if ( !manager->StartAction( type ) ) {
         if ( !is_running ) {
             return;
@@ -32,11 +37,22 @@ void UFlight::Start( const FInputActionValue &value ) {
     if ( !is_running ) {
         time_held = 0.f;
         is_running = true;
+
+        if ( character_movement->MovementMode != MOVE_Falling ) {
+            const FVector up_velocity = ( parent->gimbal->GetUpVector() ) * ( 10000.f );
+            character_movement->AddImpulse( up_velocity, false );
+        }
         character_movement->SetMovementMode( MOVE_Flying );
     }
 
-    FVector new_force = parent->gimbal->GetForwardVector();//velocity_curve->GetVectorValue( FMath::Clamp( time_held / total_curve_time, 0.f, 1.f ) );
-    character_movement->AddImpulse( new_force * flight_power, false );
+    // const FVector curve_value = velocity_curve->GetVectorValue( FMath::Clamp( time_held / total_curve_time, 0.f, 1.f ) );
+    const FVector last_input = parent->GetLastMovementInput();
+
+    const FVector fwd_velocity = parent->camera->GetForwardVector() * flight_power; //* curve_value.X );
+    const FVector up_velocity = ( parent->gimbal->GetUpVector() * last_input.Z ) * lift_power;
+
+    const FVector new_force = fwd_velocity + up_velocity;
+    character_movement->AddImpulse( new_force, false );
 
     DrawDebugLine( GetWorld(), parent->GetActorLocation(), parent->GetActorLocation() + ( new_force * flight_power ), FColor::Green, false, 0.f, ( uint8 )0U, 5.f );
 

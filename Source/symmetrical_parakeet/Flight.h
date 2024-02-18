@@ -31,7 +31,10 @@ public: // Variables
     float total_curve_time = 1.f;
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly )
-    float flight_power = 500.f;
+    float flight_power = 1000.f;
+
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly )
+    float lift_power = 500.f;
 
 private: // Variables
     UCharacterMovementComponent *character_movement;

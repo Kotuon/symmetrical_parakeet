@@ -25,6 +25,9 @@ public:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Arm Lerp" )
     float lerpTime = 1.f;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Arm Lerp" )
+    float startVelocity = 600.f;
+
 private:
     ACharacter *parent;
     USceneComponent *gimbal;

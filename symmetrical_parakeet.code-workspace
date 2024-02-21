@@ -27,7 +27,9 @@
             "limits": "cpp",
             "ratio": "cpp",
             "tuple": "cpp",
-            "vector": "cpp"
+            "vector": "cpp",
+            "chrono": "cpp",
+            "span": "cpp"
         }
 	},
 	"extensions": {

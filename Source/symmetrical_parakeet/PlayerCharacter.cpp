@@ -8,7 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h" // UCharacterMovementComponent class
 #include "Action.h"                                   // UAction class
 #include "ActionManager.h"                            // UActionManager class
-#include "GameFramework/MovementComponent.h"
+#include "Glide.h"                                    // UGlide class
+#include "GameFramework/MovementComponent.h"          //
 
 // Sets default values
 APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer ) : ACharacter( ObjectInitializer ) {
@@ -25,6 +26,8 @@ APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer 
     spring_arm->SetupAttachment( gimbal );
     camera = CreateDefaultSubobject< UCameraComponent >( FName( "Camera" ) );
     camera->SetupAttachment( spring_arm );
+
+    glide = Cast< UGlide >( CreateDefaultSubobject< UGlide >( FName( "Glide" ) ) );
 }
 
 // Called when the game starts or when spawned
@@ -44,14 +47,7 @@ void APlayerCharacter::BeginPlay() {
 void APlayerCharacter::Tick( float DeltaTime ) {
     Super::Tick( DeltaTime );
 
-    if ( character_movement->MovementMode == MOVE_Falling || character_movement->MovementMode == MOVE_Flying ) {
-        const FVector curr_velocity = GetVelocity();
-
-        // if ( curr_velocity.Z < 0.f ) {
-            const FRotator new_rotation = curr_velocity.Rotation();
-            SetActorRotation( new_rotation );
-        // }
-    }
+    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, FString::SanitizeFloat( GetVelocity().Size2D() ) );
 }
 
 // Called to bind functionality to input

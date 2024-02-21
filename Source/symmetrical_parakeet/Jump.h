@@ -6,6 +6,8 @@
 #include "Action.h"
 #include "Jump.generated.h"
 
+class UCharacterMovementComponent;
+
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class SYMMETRICAL_PARAKEET_API UJump : public UAction {
     GENERATED_BODY()
@@ -28,22 +30,14 @@ public: // Functions
     void ResetJumpMemory();
 
 public: // Variables
-    // Jump
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Animation" )
-    UAnimMontage *standing_jump_animation;
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Animation" )
-    UAnimMontage *running_jump_animation;
-
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "General" )
-    float jump_velocity = 420.f;
-
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "General|Jump Memory" )
     float jump_memory_time = 0.25f;
 
 private: // Variables
+    UCharacterMovementComponent *character_movement;
+
     FTimerHandle jump_memory_handle;
 
-    float start_jump_velocity;
     bool has_jumped = false;
     bool jump_memory = false;
 };

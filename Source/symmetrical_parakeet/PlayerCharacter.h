@@ -12,6 +12,7 @@ class USmartSpringArm;
 class UCameraComponent;
 class UAction;
 class UActionManager;
+class UGlide;
 
 UCLASS()
 class SYMMETRICAL_PARAKEET_API APlayerCharacter : public ACharacter {
@@ -63,6 +64,10 @@ public: // Variables
     // Running
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Jump" )
     UAnimMontage *run_to_stop_animation;
+
+    // Glide
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Glide" )
+    UGlide *glide;
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Camera" )
     float sensitivity = 1.f;

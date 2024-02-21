@@ -5,15 +5,14 @@
 // Sets default values for this component's properties
 UAction::UAction() {
     PrimaryComponentTick.bCanEverTick = false;
-
     // ...
 }
 
 // Called when the game starts
 void UAction::BeginPlay() {
     Super::BeginPlay();
-
     // ...
+
     parent = Cast< APlayerCharacter >( GetOwner() );
 }
 

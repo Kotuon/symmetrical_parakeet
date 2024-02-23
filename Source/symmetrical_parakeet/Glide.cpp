@@ -34,7 +34,9 @@ void UGlide::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponen
     Falling( last_input );
     Movement( last_input, DeltaTime );
 
-    air_time += DeltaTime;
+    if ( character_movement->IsFalling() ) {
+        air_time += DeltaTime;
+    }
 }
 
 void UGlide::OnLanded( const FHitResult &Hit ) {
@@ -43,9 +45,8 @@ void UGlide::OnLanded( const FHitResult &Hit ) {
     is_diving = false;
     UAnimInstance *anim = parent->GetMesh()->GetAnimInstance();
 
-    IGlideFunctions *i_anim = Cast< IGlideFunctions >( anim );
-    if ( i_anim ) {
-        i_anim->Execute_Dive( anim, false );
+    if ( anim->Implements< UGlideFunctions >() ) {
+        IGlideFunctions::Execute_Dive( anim, false );
     }
 
     if ( air_time > time_for_hard_landing ) {
@@ -78,6 +79,9 @@ bool UGlide::CheckDivingJump() {
     FHitResult hit_result;
     const bool result = GetWorld()->LineTraceSingleByChannel( hit_result, start, end, ECollisionChannel::ECC_Visibility );
 
+    // DrawDebugLine( GetWorld(), start, end, FColor::Green, false, 5.f, ( uint8 )0U, 2.f );
+    // GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Green, result ? "Glide: True" : "Glide: False" );
+
     diving_jump = !result;
 
     return diving_jump;
@@ -88,25 +92,24 @@ void UGlide::Dive_Implementation( bool is_diving_ ) {
 
     UAnimInstance *anim = parent->GetMesh()->GetAnimInstance();
 
-    IGlideFunctions *i_anim = Cast< IGlideFunctions >( anim );
-    if ( i_anim ) {
-        i_anim->Execute_Dive( anim, is_diving );
+    if ( anim->Implements< UGlideFunctions >() ) {
+        IGlideFunctions::Execute_SetDiving( anim, is_diving );
     }
 }
 
 void UGlide::Falling( const FVector &last_input ) {
+    current_fwd_speed = 0.f;
+
     if ( has_default_falling_lift && has_lift ) {
         const FVector last_velocity = parent->GetVelocity();
 
-        if ( last_input.X + last_input.Y == 0.f ) {
-            if ( character_movement->IsFalling() ) {
-                if ( !is_diving ) {
-                    const float lift_value = default_falling_lift * -1.f;
+        if ( character_movement->IsFalling() ) {
+            if ( !is_diving ) {
+                const float lift_value = default_falling_lift * -1.f;
 
-                    if ( last_velocity.Y != lift_value ) {
-                        current_velocity = FVector( 0.f, 0.f, lift_value );
-                        parent->LaunchCharacter( current_velocity, false, false );
-                    }
+                if ( last_velocity.Z != lift_value ) {
+                    current_velocity = FVector( 0.f, 0.f, default_falling_lift );
+                    parent->LaunchCharacter( current_velocity, false, false );
                 }
             }
         }
@@ -114,13 +117,18 @@ void UGlide::Falling( const FVector &last_input ) {
 }
 
 void UGlide::Movement( const FVector &last_input, float DeltaTime ) {
-    if ( !is_diving ) {
-        axis.Y = last_input.Y;
-
-    } else {
+    if ( is_diving ) {
         axis.X = 0.f;
         axis.Y = 1.f;
+
+        return;
     }
+
+    axis.X = last_input.X;
+    axis.Y = last_input.Y;
+
+    ForwardBackwardMovement( DeltaTime );
+    LeftRightMovement( DeltaTime );
 }
 
 void UGlide::ForwardBackwardMovement( float DeltaTime ) {

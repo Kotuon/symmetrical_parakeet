@@ -51,18 +51,17 @@ void UJump::End() {
 }
 
 void UJump::JumpTakeOff() {
-    const FVector velocity = parent->GetVelocity();
+    const FVector velocity = character_movement->Velocity;
     const float velocity_xy = velocity.Size2D();
 
-    character_movement->JumpZVelocity = UKismetMathLibrary::MapRangeClamped( velocity_xy, 400.f, 800.f, 500.f, 700.f );
+    character_movement->JumpZVelocity = UKismetMathLibrary::MapRangeClamped( velocity_xy, 400.f, 800.f, 700.f, 900.f );
 
     const bool result = parent->glide->CheckDivingJump();
 
     UAnimInstance *anim = parent->GetMesh()->GetAnimInstance();
 
-    IGlideFunctions *i_anim = Cast< IGlideFunctions >( anim );
-    if ( i_anim ) {
-        i_anim->Execute_SetDiving( anim, result );
+    if ( anim->Implements< UGlideFunctions >() ) {
+        IGlideFunctions::Execute_SetDiving( anim, result );
     }
 
     parent->Jump();

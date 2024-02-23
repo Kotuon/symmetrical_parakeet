@@ -80,15 +80,12 @@ void APlayerCharacter::Move( const FInputActionValue &value ) {
     const FVector2D input_value = value.Get< FVector2D >();
     last_movement_input = FVector( input_value.X, input_value.Y, 0.f );
 
-    if ( !can_walk )
-        return;
-
     const FRotator gimbal_rotation_yaw = FRotator{ 0.0, gimbal->GetComponentRotation().Yaw, 0.0 };
     const FVector world_forward = UKismetMathLibrary::GetForwardVector( gimbal_rotation_yaw );
     const FVector world_right = UKismetMathLibrary::GetRightVector( gimbal_rotation_yaw );
 
-    AddMovementInput( world_forward, input_value.Y );
-    AddMovementInput( world_right, input_value.X );
+    AddMovementInput( world_forward, input_value.Y, false );
+    AddMovementInput( world_right, input_value.X, false );
 }
 
 void APlayerCharacter::Look( const FInputActionValue &value ) {

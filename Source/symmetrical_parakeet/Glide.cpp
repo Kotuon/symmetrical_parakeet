@@ -103,6 +103,10 @@ void UGlide::Falling( const FVector &last_input ) {
     if ( has_default_falling_lift && has_lift ) {
         const FVector last_velocity = parent->GetVelocity();
 
+        if ( last_input.X + last_input.Y != 0.f ) {
+            return;
+        }
+
         if ( character_movement->IsFalling() ) {
             if ( !is_diving ) {
                 const float lift_value = default_falling_lift * -1.f;
@@ -110,6 +114,7 @@ void UGlide::Falling( const FVector &last_input ) {
                 if ( last_velocity.Z != lift_value ) {
                     current_velocity = FVector( 0.f, 0.f, default_falling_lift );
                     parent->LaunchCharacter( current_velocity, false, false );
+                    GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Cyan, "Updraft" );
                 }
             }
         }

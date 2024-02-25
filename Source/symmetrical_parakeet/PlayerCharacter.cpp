@@ -47,7 +47,6 @@ void APlayerCharacter::BeginPlay() {
 void APlayerCharacter::Tick( float DeltaTime ) {
     Super::Tick( DeltaTime );
 
-    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, FString::SanitizeFloat( GetVelocity().Size2D() ) );
 }
 
 // Called to bind functionality to input

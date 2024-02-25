@@ -41,6 +41,7 @@ void UGlide::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponen
 
 void UGlide::OnLanded( const FHitResult &Hit ) {
     has_lift = false;
+    going_to_land = false;
 
     is_diving = false;
     UAnimInstance *anim = parent->GetMesh()->GetAnimInstance();
@@ -114,7 +115,17 @@ void UGlide::Falling( const FVector &last_input ) {
                 if ( last_velocity.Z != lift_value ) {
                     current_velocity = FVector( 0.f, 0.f, default_falling_lift );
                     parent->LaunchCharacter( current_velocity, false, false );
-                    GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Cyan, "Updraft" );
+                }
+
+                const FVector position = parent->GetActorLocation();
+                const FVector end = position + FVector( 0.f, 0.f, -landing_distance );
+
+
+                FHitResult hit_result;
+                going_to_land = GetWorld()->LineTraceSingleByChannel( hit_result, position, end, ECollisionChannel::ECC_Visibility );
+                if ( going_to_land ) {
+                    DrawDebugLine( GetWorld(), position, end, FColor::Red );
+                    distance_from_ground = FVector::Dist( position, hit_result.ImpactPoint );
                 }
             }
         }
@@ -170,4 +181,12 @@ void UGlide::LeftRightMovement( float DeltaTime ) {
 
     const float new_roll_speed = roll_check ? roll_a : roll_b;
     current_roll_speed = FMath::FInterpTo( current_roll_speed, new_roll_speed, DeltaTime, 2.f );
+}
+
+float UGlide::GetDistanceFromGround() const {
+    return distance_from_ground;
+}
+
+bool UGlide::GetGoingToLand() const {
+    return going_to_land;
 }

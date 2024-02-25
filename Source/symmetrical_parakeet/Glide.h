@@ -41,6 +41,12 @@ public: // Functions
     void Dive( bool is_diving_ );
     virtual void Dive_Implementation( bool is_diving_ ) override;
 
+    UFUNCTION( BlueprintCallable )
+    float GetDistanceFromGround() const;
+
+    UFUNCTION( BlueprintCallable )
+    bool GetGoingToLand() const;
+
 private: // Functions
     void Falling( const FVector &last_input );
     void Movement( const FVector &last_input, float DeltaTime );
@@ -70,6 +76,10 @@ public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
     float roll_turn_speed = 80.f;
 
+    // Fall distance
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
+    float landing_distance = 500.f;
+
 private: // Variables
     APlayerCharacter *parent;
     UCharacterMovementComponent *character_movement;
@@ -77,11 +87,15 @@ private: // Variables
     FVector current_velocity;
     FVector axis;
 
+    float distance_from_ground;
+
     float current_pitch_speed;
     float current_roll_speed;
 
     float current_fwd_speed = 0.f;
     float air_time = 0.f;
+
+    bool going_to_land = false;
 
     bool has_lift = false;
 

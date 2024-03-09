@@ -46,7 +46,6 @@ void APlayerCharacter::BeginPlay() {
 // Called every frame
 void APlayerCharacter::Tick( float DeltaTime ) {
     Super::Tick( DeltaTime );
-
 }
 
 // Called to bind functionality to input
@@ -80,6 +79,7 @@ void APlayerCharacter::Move( const FInputActionValue &value ) {
     last_movement_input = FVector( input_value.X, input_value.Y, 0.f );
 
     const FRotator gimbal_rotation_yaw = FRotator{ 0.0, gimbal->GetComponentRotation().Yaw, 0.0 };
+
     const FVector world_forward = UKismetMathLibrary::GetForwardVector( gimbal_rotation_yaw );
     const FVector world_right = UKismetMathLibrary::GetRightVector( gimbal_rotation_yaw );
 

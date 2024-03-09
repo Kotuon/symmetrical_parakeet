@@ -22,7 +22,4 @@ class SYMMETRICAL_PARAKEET_API IGlideFunctions {
 public:
     UFUNCTION( BlueprintCallable, BlueprintImplementableEvent )
     void SetDiving( bool is_diving_ );
-
-    UFUNCTION( BlueprintCallable, BlueprintNativeEvent )
-    void Dive( bool is_diving_ );
 };

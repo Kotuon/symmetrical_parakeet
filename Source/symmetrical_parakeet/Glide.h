@@ -9,6 +9,7 @@
 
 class APlayerCharacter;
 class UCharacterMovementComponent;
+class UCapsuleComponent;
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class SYMMETRICAL_PARAKEET_API UGlide : public UActorComponent, public IGlideFunctions {
@@ -37,21 +38,33 @@ public: // Functions
     UFUNCTION( BlueprintCallable )
     bool CheckDivingJump();
 
-    UFUNCTION( BlueprintCallable, BlueprintNativeEvent, Category = "Glide" )
-    void Dive( bool is_diving_ );
-    virtual void Dive_Implementation( bool is_diving_ ) override;
-
     UFUNCTION( BlueprintCallable )
     float GetDistanceFromGround() const;
 
     UFUNCTION( BlueprintCallable )
     bool GetGoingToLand() const;
 
+    UFUNCTION( BlueprintCallable )
+    bool GetHasLift() const;
+
+    UFUNCTION()
+    void Toggle( bool should_enable );
+
+    UFUNCTION( BlueprintCallable )
+    float GetPitchSpeed() const;
+
+    UFUNCTION( BlueprintCallable )
+    float GetRollSpeed() const;
+
 private: // Functions
     void Falling( const FVector &last_input );
     void Movement( const FVector &last_input, float DeltaTime );
     void ForwardBackwardMovement( float DeltaTime );
     void LeftRightMovement( float DeltaTime );
+    void StartGliding();
+    void GlideTick( float DeltaTime, const FVector &last_input );
+    bool HitTraces();
+    void UpdateGliding( float DeltaTime );
 
 public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Animations" )
@@ -64,6 +77,18 @@ public: // Variables
     bool has_default_falling_lift = true;
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Default Lift" )
     float default_falling_lift = 8.f;
+
+    // Initial
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Initial" )
+    float initial_velocity = 500.f;
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Initial" )
+    float initial_impulse_strength = 800.f;
+
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
+    float acceleration = 400.f;
+
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
+    float max_momentum = 10000.f;
 
     // Pitch
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
@@ -80,12 +105,32 @@ public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
     float landing_distance = 500.f;
 
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
+    float pull_up_modifier = 4.f;
+
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings" )
+    float min_fall_height = 100.f;
+
+    // Trace distances
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Trace Distances" )
+    float down_trace_distance = 120.f;
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Trace Distances" )
+    float front_trace_distance = 150.f;
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Trace Distances" )
+    float front_angled_trace_distance = 120.f;
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Trace Distances" )
+    float trace_height_offset = 50.f;
+
 private: // Variables
     APlayerCharacter *parent;
     UCharacterMovementComponent *character_movement;
+    UCapsuleComponent *capsule;
+
+    FVector axis;
 
     FVector current_velocity;
-    FVector axis;
+    FVector last_velocity;
+    FVector glide_velocity;
 
     float distance_from_ground;
 
@@ -93,12 +138,16 @@ private: // Variables
     float current_roll_speed;
 
     float current_fwd_speed = 0.f;
+    float fwd_momentum = 0.f;
+
+    float timeout = 0.f;
+
     float air_time = 0.f;
 
     bool going_to_land = false;
+    bool gliding = false;
 
     bool has_lift = false;
 
     bool diving_jump = false;
-    bool is_diving = false;
 };

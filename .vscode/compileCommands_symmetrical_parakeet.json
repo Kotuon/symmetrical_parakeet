@@ -40,6 +40,22 @@
 		"directory": "E:\\UE_5.3\\Engine\\Source"
 	},
 	{
+		"file": "C:\\Users\\Kelson\\Documents\\Projects\\symmetrical_parakeet\\Source\\symmetrical_parakeet\\Fall.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.37.32822\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\Kelson\\Documents\\Projects\\symmetrical_parakeet\\.vscode\\compileCommands_symmetrical_parakeet\\symmetrical_parakeet.1.rsp"
+		],
+		"directory": "E:\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\Kelson\\Documents\\Projects\\symmetrical_parakeet\\Source\\symmetrical_parakeet\\Fall.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.37.32822\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\Kelson\\Documents\\Projects\\symmetrical_parakeet\\.vscode\\compileCommands_symmetrical_parakeet\\symmetrical_parakeet.1.rsp"
+		],
+		"directory": "E:\\UE_5.3\\Engine\\Source"
+	},
+	{
 		"file": "C:\\Users\\Kelson\\Documents\\Projects\\symmetrical_parakeet\\Source\\symmetrical_parakeet\\Flight.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.37.32822\\bin\\Hostx64\\x64\\cl.exe",

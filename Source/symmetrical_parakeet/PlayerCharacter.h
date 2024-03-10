@@ -12,7 +12,7 @@ class USmartSpringArm;
 class UCameraComponent;
 class UAction;
 class UActionManager;
-class UGlide;
+class UFall;
 
 UCLASS()
 class SYMMETRICAL_PARAKEET_API APlayerCharacter : public ACharacter {
@@ -27,8 +27,6 @@ public: // Functions
     virtual void Tick( float DeltaTime ) override;
 
     virtual void SetupPlayerInputComponent( class UInputComponent *PlayerInputComponent ) override;
-
-    void StartPlayerRotation();
 
     UFUNCTION( BlueprintCallable )
     void SetCanWalk( bool canWalk );
@@ -66,8 +64,8 @@ public: // Variables
     UAnimMontage *run_to_stop_animation;
 
     // Glide
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Glide" )
-    UGlide *glide;
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Fall" )
+    UFall *fall;
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Camera" )
     float sensitivity = 1.f;
@@ -75,8 +73,6 @@ public: // Variables
 private: // Functions
     void Move( const FInputActionValue &value );
     void Look( const FInputActionValue &value );
-
-    void UpdatePlayerRotation();
 
     void UpdateCameraRotation();
 

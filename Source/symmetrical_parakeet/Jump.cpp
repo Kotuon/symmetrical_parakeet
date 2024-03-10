@@ -8,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"                 // MapRangeClamped
 #include "Glide.h"                                    // UGlide class
 #include "GlideFunctions.h"                           // Glide interface
+#include "Fall.h"                                     // UFall class
 
 UJump::UJump() {
     type = EAction::A_Jump;
@@ -56,7 +57,8 @@ void UJump::JumpTakeOff() {
 
     character_movement->JumpZVelocity = UKismetMathLibrary::MapRangeClamped( velocity_xy, 400.f, 800.f, 700.f, 900.f );
 
-    const bool result = parent->glide->CheckDivingJump();
+    // TODO change glide to fall
+    const bool result = parent->fall->CheckDivingJump();
 
     UAnimInstance *anim = parent->GetMesh()->GetAnimInstance();
 

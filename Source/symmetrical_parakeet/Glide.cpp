@@ -203,7 +203,7 @@ void UGlide::Toggle( bool should_enable ) {
         StartGliding();
 
         glide_velocity = parent->GetActorRotation().UnrotateVector( capsule->GetComponentVelocity() );
-        character_movement->AddImpulse( glide_velocity * initial_impulse_strength, true );
+        // character_movement->AddImpulse( glide_velocity * initial_impulse_strength, true );
 
         GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Yellow, "Start gliding." );
 
@@ -322,10 +322,10 @@ void UGlide::UpdateGliding( float DeltaTime ) {
         fwd_momentum = FMath::Clamp( unclamped_value, max_momentum * -1.f, max_momentum );
     }
 
-    const FVector unrotated_momentum = parent->GetActorRotation().UnrotateVector( FVector( fwd_momentum, 0.f, 0.f ) );
+    const FVector rotated_momentum = parent->GetActorRotation().RotateVector( FVector( fwd_momentum, 0.f, 0.f ) );
     const float lerp_alpha = UKismetMathLibrary::NormalizeToRange( current_fwd_speed, 0.f, 1200.f );
     const float lerp_alpha_clamped = FMath::Clamp( lerp_alpha, 0.f, 0.95f );
-    const FVector new_vel = FMath::Lerp( capsule->GetComponentVelocity(), unrotated_momentum, lerp_alpha_clamped );
+    const FVector new_vel = FMath::Lerp( capsule->GetComponentVelocity(), rotated_momentum, lerp_alpha_clamped );
 
     const FVector final_vel = FMath::VInterpTo( capsule->GetComponentVelocity(), new_vel, DeltaTime, 5.f );
     capsule->SetPhysicsLinearVelocity( final_vel );

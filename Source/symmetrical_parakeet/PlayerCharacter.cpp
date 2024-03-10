@@ -10,6 +10,7 @@
 #include "ActionManager.h"                            // UActionManager class
 #include "Glide.h"                                    // UGlide class
 #include "GameFramework/MovementComponent.h"          //
+#include "Fall.h"                                     // UFall class
 
 // Sets default values
 APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer ) : ACharacter( ObjectInitializer ) {
@@ -27,7 +28,8 @@ APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer 
     camera = CreateDefaultSubobject< UCameraComponent >( FName( "Camera" ) );
     camera->SetupAttachment( spring_arm );
 
-    glide = Cast< UGlide >( CreateDefaultSubobject< UGlide >( FName( "Glide" ) ) );
+    // glide = Cast< UGlide >( CreateDefaultSubobject< UGlide >( FName( "Glide" ) ) );
+    fall = Cast< UFall >( CreateDefaultSubobject< UFall >( FName( "Fall" ) ) );
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +48,9 @@ void APlayerCharacter::BeginPlay() {
 // Called every frame
 void APlayerCharacter::Tick( float DeltaTime ) {
     Super::Tick( DeltaTime );
+
+    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, character_movement->Velocity.ToString() );
+    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Red, character_movement->GetCurrentAcceleration().ToString() );
 }
 
 // Called to bind functionality to input
@@ -78,6 +83,10 @@ void APlayerCharacter::Move( const FInputActionValue &value ) {
     const FVector2D input_value = value.Get< FVector2D >();
     last_movement_input = FVector( input_value.X, input_value.Y, 0.f );
 
+    if ( fall->IsFalling() ) {
+        return;
+    }
+
     const FRotator gimbal_rotation_yaw = FRotator{ 0.0, gimbal->GetComponentRotation().Yaw, 0.0 };
 
     const FVector world_forward = UKismetMathLibrary::GetForwardVector( gimbal_rotation_yaw );
@@ -99,26 +108,6 @@ void APlayerCharacter::Look( const FInputActionValue &value ) {
 
     const FRotator new_pitch{ clamped_pitch, 0.0, 0.0 };
     spring_arm->SetRelativeRotation( new_pitch );
-}
-
-void APlayerCharacter::StartPlayerRotation() {
-    old_player_rotation = GetActorRotation();
-    new_player_rotation = gimbal->GetRelativeRotation();
-    timeSinceRotateStarted = 0.f;
-    GetWorldTimerManager().SetTimer( player_rotation_time_handle, this, &APlayerCharacter::UpdatePlayerRotation, 0.01f, true, 0.f );
-}
-
-void APlayerCharacter::UpdatePlayerRotation() {
-    timeSinceRotateStarted += 0.01f;
-    const float t = timeSinceRotateStarted / 0.15f;
-
-    if ( t > 1.f ) {
-        GetWorldTimerManager().ClearTimer( player_rotation_time_handle );
-        return;
-    }
-
-    const FRotator new_rotation = FQuat::Slerp( old_player_rotation.Quaternion(), new_player_rotation.Quaternion(), t ).Rotator();
-    SetActorRotation( new_rotation );
 }
 
 void APlayerCharacter::SetCanWalk( bool canWalk ) {

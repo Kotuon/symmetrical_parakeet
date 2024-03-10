@@ -5,6 +5,10 @@
 #include "PlayerCharacter.h"                          // APlayerCharacter class
 #include "GameFramework/CharacterMovementComponent.h" // UCharacterMovementComponent class
 #include "Components/CapsuleComponent.h"              // UCapsuleComponent class
+#include "Kismet/KismetMathLibrary.h"                 // MapRangeClamped
+#include "Glide.h"                                    // UGlide class
+#include "GlideFunctions.h"                           // Glide interface
+#include "Fall.h"                                     // UFall class
 
 UJump::UJump() {
     type = EAction::A_Jump;
@@ -13,7 +17,8 @@ UJump::UJump() {
 void UJump::BeginPlay() {
     Super::BeginPlay();
 
-    start_jump_velocity = jump_velocity;
+    character_movement = parent->GetCharacterMovement();
+
     parent->MovementModeChangedDelegate.AddUniqueDynamic( this, &UJump::MovementModeChanged );
 }
 
@@ -22,53 +27,47 @@ void UJump::Start( const FInputActionValue &value ) {
         parent->SetLastMovementZInput( 1.f );
     } else {
         parent->SetLastMovementZInput( 0.f );
+        End();
+        return;
     }
 
-    if ( has_jumped ) {
+    if ( character_movement->IsFalling() && !jump_memory ) {
         jump_memory = true;
         parent->GetWorldTimerManager().SetTimer( jump_memory_handle, this, &UJump::ResetJumpMemory, 0.1f, false, jump_memory_time );
         return;
     }
     has_jumped = true;
 
-    start_jump_velocity = parent->GetVelocity().Length();
-
     if ( !manager->StartAction( type ) ) {
         return;
     }
 
-    if ( start_jump_velocity > 0 ) {
-        if ( IsValid( running_jump_animation ) ) {
-            parent->PlayAnimMontage( running_jump_animation );
-        } else {
-            JumpTakeOff();
-        }
-        return;
-    }
-
-    if ( IsValid( standing_jump_animation ) ) {
-        parent->PlayAnimMontage( standing_jump_animation );
-    } else {
-        JumpTakeOff();
-    }
+    JumpTakeOff();
 }
 
 void UJump::End() {
     Super::End();
+
+    parent->StopJumping();
 }
 
 void UJump::JumpTakeOff() {
-    const FVector up_direction = parent->GetCapsuleComponent()->GetUpVector();
-    FVector xy_direction = FVector( 0 );
+    const FVector velocity = character_movement->Velocity;
+    const float velocity_xy = velocity.Size2D();
 
-    const FVector last_movement_input = parent->GetLastMovementInput();
+    character_movement->JumpZVelocity = UKismetMathLibrary::MapRangeClamped( velocity_xy, 400.f, 800.f, 700.f, 900.f );
 
-    xy_direction = ( parent->gimbal->GetForwardVector() * last_movement_input.Y ) + ( parent->gimbal->GetRightVector() * last_movement_input.X );
-    xy_direction.Normalize();
+    // TODO change glide to fall
+    const bool result = parent->fall->CheckDivingJump();
 
-    FVector jump_direction = ( up_direction * jump_velocity ) + ( xy_direction * start_jump_velocity );
+    UAnimInstance *anim = parent->GetMesh()->GetAnimInstance();
 
-    parent->LaunchCharacter( jump_direction, true, true );
+    if ( anim->Implements< UGlideFunctions >() ) {
+        IGlideFunctions::Execute_SetDiving( anim, result );
+    }
+
+    parent->Jump();
+    character_movement->bNotifyApex = true;
 }
 
 void UJump::MovementModeChanged( ACharacter *Character, EMovementMode PrevMovementMode, uint8 PrevCustomMode ) {

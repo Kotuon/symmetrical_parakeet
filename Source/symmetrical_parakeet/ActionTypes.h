@@ -6,6 +6,7 @@
 UENUM( BlueprintType )
 enum class EAction : uint8 {
     A_None UMETA( DisplayName = "None" ),
+    A_Sprint UMETA( DisplayName = "Sprint" ),
     A_Jump UMETA( DisplayName = "Jump" ),
     A_Flight UMETA( DisplayName = "Flight" ),
 };

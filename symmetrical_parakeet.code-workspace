@@ -11,24 +11,7 @@
 	],
 	"settings": {
 		"typescript.tsc.autoDetect": "off",
-        "npm.autoDetect": "off",
-        "files.associations": {
-            "algorithm": "cpp",
-            "complex": "cpp",
-            "functional": "cpp",
-            "type_traits": "cpp",
-            "xtr1common": "cpp",
-            "xutility": "cpp",
-            "*.ipp": "cpp",
-            "__bit_reference": "cpp",
-            "bitset": "cpp",
-            "deque": "cpp",
-            "__memory": "cpp",
-            "limits": "cpp",
-            "ratio": "cpp",
-            "tuple": "cpp",
-            "vector": "cpp"
-        }
+		"npm.autoDetect": "off"
 	},
 	"extensions": {
 		"recommendations": [

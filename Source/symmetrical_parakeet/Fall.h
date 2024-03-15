@@ -22,6 +22,9 @@ public: // Functions
 
     virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction ) override;
 
+    UFUNCTION()
+    void MovementModeChanged( ACharacter *Character, EMovementMode PrevMovementMode, uint8 PrevCustomMode );
+
     // Diving Jump
     UFUNCTION( BlueprintCallable )
     bool CheckDivingJump();

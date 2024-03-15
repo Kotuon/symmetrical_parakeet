@@ -13,6 +13,7 @@ class UCameraComponent;
 class UAction;
 class UActionManager;
 class UFall;
+class UFlight;
 
 UCLASS()
 class SYMMETRICAL_PARAKEET_API APlayerCharacter : public ACharacter {
@@ -39,7 +40,7 @@ public: // Functions
     void SetLastMovementZInput( const float input_value );
 
 public: // Variables
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Actions" )
+    UPROPERTY( VisibleDefaultsOnly, BlueprintReadOnly, Category = "Actions" )
     UActionManager *action_manager;
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Input" )
@@ -64,8 +65,10 @@ public: // Variables
     UAnimMontage *run_to_stop_animation;
 
     // Glide
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Fall" )
+    UPROPERTY( VisibleDefaultsOnly, BlueprintReadOnly, Category = "Fall" )
     UFall *fall;
+    UPROPERTY( VisibleDefaultsOnly, BlueprintReadOnly, Category = "Flight" )
+    UFlight *flight;
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Camera" )
     float sensitivity = 1.f;

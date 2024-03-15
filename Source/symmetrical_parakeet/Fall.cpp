@@ -24,6 +24,7 @@ void UFall::BeginPlay() {
     world = GetWorld();
 
     parent->LandedDelegate.AddUniqueDynamic( this, &UFall::OnLanded );
+    parent->MovementModeChangedDelegate.AddUniqueDynamic( this, &UFall::MovementModeChanged );
 }
 
 // Called every frame
@@ -53,6 +54,15 @@ void UFall::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponent
                 DrawDebugLine( GetWorld(), position, end, FColor::Red, false, 2.f );
                 falling = false;
             }
+        }
+    }
+}
+
+void UFall::MovementModeChanged( ACharacter *Character, EMovementMode PrevMovementMode, uint8 PrevCustomMode ) {
+    if ( PrevMovementMode == MOVE_Falling && parent->GetCharacterMovement()->MovementMode == MOVE_Flying ) {
+        air_time = 0.f;
+        if ( falling ) {
+            Toggle( false );
         }
     }
 }
@@ -160,7 +170,7 @@ void UFall::ForwardBackwardMovement( const FVector &last_input ) {
     if ( last_input.Y > 0.f ) {
         const FVector fwd = parent->GetActorForwardVector();
 
-        character_movement->AddImpulse( fwd * fall_fwd_speed, true );
+        character_movement->AddImpulse( fwd * fall_fwd_speed, false );
         FVector result = character_movement->Velocity;
         if ( character_movement->Velocity.SizeSquared2D() > FMath::Square( max_fall_fwd_speed ) ) {
             result = FVector::PointPlaneProject( result, FVector::ZeroVector, fwd ) + fwd * max_fall_fwd_speed;

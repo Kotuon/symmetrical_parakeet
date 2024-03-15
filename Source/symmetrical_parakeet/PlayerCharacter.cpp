@@ -11,6 +11,7 @@
 #include "Glide.h"                                    // UGlide class
 #include "GameFramework/MovementComponent.h"          //
 #include "Fall.h"                                     // UFall class
+#include "Flight.h"                                   // UFlight class
 
 // Sets default values
 APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer ) : ACharacter( ObjectInitializer ) {
@@ -28,8 +29,8 @@ APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer 
     camera = CreateDefaultSubobject< UCameraComponent >( FName( "Camera" ) );
     camera->SetupAttachment( spring_arm );
 
-    // glide = Cast< UGlide >( CreateDefaultSubobject< UGlide >( FName( "Glide" ) ) );
     fall = Cast< UFall >( CreateDefaultSubobject< UFall >( FName( "Fall" ) ) );
+    flight = Cast< UFlight >( CreateDefaultSubobject< UFlight >( FName( "Flight" ) ) );
 }
 
 // Called when the game starts or when spawned
@@ -83,7 +84,7 @@ void APlayerCharacter::Move( const FInputActionValue &value ) {
     const FVector2D input_value = value.Get< FVector2D >();
     last_movement_input = FVector( input_value.X, input_value.Y, 0.f );
 
-    if ( fall->IsFalling() ) {
+    if ( fall->IsFalling() || flight->IsRunning() ) {
         return;
     }
 

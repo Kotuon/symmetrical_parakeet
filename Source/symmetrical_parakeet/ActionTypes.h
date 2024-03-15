@@ -9,4 +9,5 @@ enum class EAction : uint8 {
     A_Sprint UMETA( DisplayName = "Sprint" ),
     A_Jump UMETA( DisplayName = "Jump" ),
     A_Flight UMETA( DisplayName = "Flight" ),
+    A_SFlight UMETA( DisplayName = "SFlight" )
 };

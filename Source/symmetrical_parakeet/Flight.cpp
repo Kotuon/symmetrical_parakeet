@@ -8,15 +8,12 @@
 #include "Blueprint/UserWidget.h"                     // UUserWidget class
 #include "Components/WidgetComponent.h"               // UWidgetComponent class
 #include "Components/ProgressBar.h"                   // UProgressBar
-#include "Components/SplineComponent.h"               // USplineComponent class
 #include "Components/Widget.h"                        // UWidget class
 
 UFlight::UFlight() {
     type = EAction::A_Flight;
     PrimaryComponentTick.bCanEverTick = true;
     SetComponentTickEnabled( true );
-
-    spline = Cast< USplineComponent >( CreateDefaultSubobject< USplineComponent >( FName( "FlightSpline" ) ) );
 }
 
 void UFlight::BeginPlay() {

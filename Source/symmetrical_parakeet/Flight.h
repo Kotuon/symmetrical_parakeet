@@ -9,7 +9,6 @@
 
 class UCharacterMovementComponent;
 class UProgressBar;
-class USpline;
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class SYMMETRICAL_PARAKEET_API UFlight : public UAction {
@@ -33,9 +32,6 @@ private: // Functions
     void StartRecharge();
 
 public: // Variables
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Spline"  )
-    USplineComponent *spline;
-
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve"  )
     UCurveFloat *velocity_curve;
 

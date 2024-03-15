@@ -14,6 +14,7 @@ class UAction;
 class UActionManager;
 class UFall;
 class UFlight;
+class USFlight;
 
 UCLASS()
 class SYMMETRICAL_PARAKEET_API APlayerCharacter : public ACharacter {
@@ -69,6 +70,8 @@ public: // Variables
     UFall *fall;
     UPROPERTY( VisibleDefaultsOnly, BlueprintReadOnly, Category = "Flight" )
     UFlight *flight;
+    UPROPERTY( VisibleDefaultsOnly, BlueprintReadOnly, Category = "Flight" )
+    USFlight *sflight;
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Camera" )
     float sensitivity = 1.f;

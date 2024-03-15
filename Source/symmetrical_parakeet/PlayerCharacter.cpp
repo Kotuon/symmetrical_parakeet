@@ -12,6 +12,7 @@
 #include "GameFramework/MovementComponent.h"          //
 #include "Fall.h"                                     // UFall class
 #include "Flight.h"                                   // UFlight class
+#include "SFlight.h"                                   // UFlight class
 
 // Sets default values
 APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer ) : ACharacter( ObjectInitializer ) {
@@ -31,6 +32,7 @@ APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer 
 
     fall = Cast< UFall >( CreateDefaultSubobject< UFall >( FName( "Fall" ) ) );
     flight = Cast< UFlight >( CreateDefaultSubobject< UFlight >( FName( "Flight" ) ) );
+    sflight = Cast< USFlight >( CreateDefaultSubobject< USFlight >( FName( "SFlight" ) ) );
 }
 
 // Called when the game starts or when spawned
@@ -84,7 +86,7 @@ void APlayerCharacter::Move( const FInputActionValue &value ) {
     const FVector2D input_value = value.Get< FVector2D >();
     last_movement_input = FVector( input_value.X, input_value.Y, 0.f );
 
-    if ( fall->IsFalling() || flight->IsRunning() ) {
+    if ( fall->IsFalling() || flight->IsRunning() || sflight->IsRunning() ) {
         return;
     }
 

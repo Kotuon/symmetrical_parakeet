@@ -167,29 +167,31 @@ void UFall::ForwardBackwardMovement( const FVector &last_input ) {
         pitch_check = true;
     }
 
-    if ( last_input.Y > 0.f ) {
-        const FVector fwd = parent->GetActorForwardVector();
+    // if ( last_input.Y > 0.f ) {
+    // const FVector fwd = parent->GetActorForwardVector();
 
-        character_movement->AddImpulse( fwd * fall_fwd_speed, false );
-        FVector result = character_movement->Velocity;
-        if ( character_movement->Velocity.SizeSquared2D() > FMath::Square( max_fall_fwd_speed ) ) {
-            result = FVector::PointPlaneProject( result, FVector::ZeroVector, fwd ) + fwd * max_fall_fwd_speed;
-            character_movement->Velocity = result;
-        }
-    }
+    // parent->AddMovementInput( fwd, fall_fwd_speed, false );
+    // FVector result = character_movement->Velocity;
+    // if ( character_movement->Velocity.SizeSquared2D() > FMath::Square( max_fall_fwd_speed ) ) {
+    //     result = FVector::PointPlaneProject( result, FVector::ZeroVector, fwd ) + fwd * max_fall_fwd_speed;
+    //     character_movement->Velocity = result;
+    // }
+    // }
 
     if ( last_input.Y < 0.f ) {
         FVector result = character_movement->Velocity;
         const FVector grav_direction = character_movement->GetGravityDirection();
-        if ( result.SizeSquared() > FMath::Square( max_pull_back_speed ) ) {
-            result = FVector::PointPlaneProject( result, FVector::ZeroVector, grav_direction ) + grav_direction * max_pull_back_speed;
-            character_movement->Velocity = result;
+        if ( result.Z < 0.f ) {
+            if ( result.SizeSquared() > FMath::Square( max_pull_back_speed ) ) {
+                result = FVector::PointPlaneProject( result, FVector::ZeroVector, grav_direction ) + grav_direction * max_pull_back_speed;
+                character_movement->Velocity = result;
+            }
         }
     }
 
     const float new_pitch_speed = pitch_check ? pitch_a : pitch_b;
 
-    current_pitch_speed = FMath::FInterpTo( current_pitch_speed, new_pitch_speed, world->GetDeltaSeconds(), 2.f );
+    current_pitch_speed = FMath::FInterpTo( current_pitch_speed, new_pitch_speed, world->GetDeltaSeconds(), 3.f );
 }
 
 void UFall::LeftRightMovement( const FVector &last_input ) {

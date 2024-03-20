@@ -60,7 +60,6 @@ void UFall::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponent
 
 void UFall::MovementModeChanged( ACharacter *Character, EMovementMode PrevMovementMode, uint8 PrevCustomMode ) {
     if ( PrevMovementMode == MOVE_Falling && parent->GetCharacterMovement()->MovementMode == MOVE_Flying ) {
-        air_time = 0.f;
         if ( falling ) {
             Toggle( false );
         }
@@ -112,6 +111,10 @@ void UFall::OnLanded( const FHitResult &Hit ) {
     if ( falling ) {
         Toggle( false );
     }
+
+    FRotator new_rotation = parent->GetActorRotation();
+    new_rotation.Roll = 0.f;
+    parent->SetActorRotation( new_rotation );
 }
 
 bool UFall::GetGoingToLand() const {
@@ -125,11 +128,13 @@ float UFall::GetDistanceFromGround() const {
 void UFall::Toggle( bool should_enable ) {
     if ( should_enable ) {
         falling = true;
+        parent->SetCanWalk( false );
         capsule->SetCapsuleHalfHeight( capsule->GetScaledCapsuleHalfHeight() / 2.f, true );
     } else {
         falling = false;
+        parent->SetCanWalk( true );
         capsule->SetCapsuleHalfHeight( capsule->GetScaledCapsuleHalfHeight() * 2.f, true );
-        parent->SetActorRotation( FRotator( 0., parent->GetActorRotation().Yaw, 0.f ) );
+        // parent->SetActorRotation( FRotator( 0., parent->GetActorRotation().Yaw, 0.f ) );
 
         current_pitch_speed = 0.f;
         current_roll_speed = 0.f;
@@ -180,12 +185,8 @@ void UFall::ForwardBackwardMovement( const FVector &last_input ) {
 
     if ( last_input.Y < 0.f ) {
         FVector result = character_movement->Velocity;
-        const FVector grav_direction = character_movement->GetGravityDirection();
-        if ( result.Z < 0.f ) {
-            if ( result.SizeSquared() > FMath::Square( max_pull_back_speed ) ) {
-                result = FVector::PointPlaneProject( result, FVector::ZeroVector, grav_direction ) + grav_direction * max_pull_back_speed;
-                character_movement->Velocity = result;
-            }
+        if ( result.Z < -max_pull_back_speed ) {
+            character_movement->Velocity.Z = FMath::FInterpTo( result.Z, -max_pull_back_speed, world->GetDeltaSeconds(), 2.f );
         }
     }
 

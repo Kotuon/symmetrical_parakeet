@@ -9,6 +9,7 @@
 #include "Components/WidgetComponent.h"               // UWidgetComponent class
 #include "Components/ProgressBar.h"                   // UProgressBar
 #include "Components/Widget.h"                        // UWidget class
+#include "Math/UnrealMathUtility.h"                   // FMath
 
 UFlight::UFlight() {
     type = EAction::A_Flight;
@@ -51,6 +52,7 @@ void UFlight::Start( const FInputActionValue &value ) {
             return;
         }
         is_running = true;
+        parent->SetCanWalk( false );
 
         if ( character_movement->MovementMode != MOVE_Falling ) {
             const FVector up_velocity = ( parent->gimbal->GetUpVector() ) * ( 100.f );
@@ -73,6 +75,8 @@ void UFlight::End() {
     //...
 
     is_running = false;
+    parent->SetCanWalk( true );
+
     character_movement->SetMovementMode( MOVE_Falling );
 
     time_held = 0.f;
@@ -83,6 +87,7 @@ void UFlight::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompone
 
     if ( is_running ) {
         time_held += DeltaTime;
+        animation_time_held = FMath::Clamp( animation_time_held + DeltaTime, 0.f, 1.f );
 
         const FVector last_input = parent->GetLastMovementInput();
         const FVector fwd = parent->camera->GetForwardVector();
@@ -92,6 +97,12 @@ void UFlight::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompone
         curr_speed = max_speed * curve_value;
         const FVector new_velocity = FMath::VInterpTo( character_movement->Velocity, fwd * curr_speed, DeltaTime, 1.f );
         character_movement->Velocity = new_velocity;
+
+        const FQuat new_rotation = FMath::QInterpTo( parent->GetActorRotation().Quaternion(), character_movement->Velocity.Rotation().Quaternion(), DeltaTime, 5.f );
+
+        parent->SetActorRotation( new_rotation );
+    } else {
+        animation_time_held = FMath::Clamp( animation_time_held - ( 2.f * DeltaTime ), 0.f, 1.f );
     }
 }
 
@@ -111,4 +122,12 @@ void UFlight::UpdateBarAlpha() {
 
 bool UFlight::IsRunning() const {
     return is_running;
+}
+
+float UFlight::GetTimeHeld() const {
+    return time_held;
+}
+
+float UFlight::GetAnimationTimeHeld() const {
+    return animation_time_held;
 }

@@ -20,6 +20,7 @@ void UJump::BeginPlay() {
     character_movement = parent->GetCharacterMovement();
 
     parent->MovementModeChangedDelegate.AddUniqueDynamic( this, &UJump::MovementModeChanged );
+    parent->LandedDelegate.AddUniqueDynamic( this, &UJump::OnLanded );
 }
 
 void UJump::Start( const FInputActionValue &value ) {
@@ -81,4 +82,17 @@ void UJump::MovementModeChanged( ACharacter *Character, EMovementMode PrevMoveme
 
 void UJump::ResetJumpMemory() {
     jump_memory = false;
+}
+
+void UJump::SetHasPlayedAnimation() {
+    has_played_jump_animation = true;
+}
+
+bool UJump::GetHasPlayedAnimation() const {
+    return has_played_jump_animation;
+}
+
+// Landing
+void UJump::OnLanded( const FHitResult &Hit ) {
+    has_played_jump_animation = false;
 }

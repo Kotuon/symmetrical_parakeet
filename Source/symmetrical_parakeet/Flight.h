@@ -24,20 +24,27 @@ public: // Functions
 
     virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction ) override;
 
+    UFUNCTION( BlueprintCallable )
     bool IsRunning() const;
+
+    UFUNCTION( BlueprintCallable )
+    float GetTimeHeld() const;
+
+    UFUNCTION( BlueprintCallable )
+    float GetAnimationTimeHeld() const;
 
 private: // Functions
     void StartBarAlpha();
     void UpdateBarAlpha();
 
 public: // Variables
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve"  )
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve" )
     UCurveFloat *velocity_curve;
 
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve"  )
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve" )
     float total_curve_time = 1.f;
 
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Speed"  )
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Speed" )
     float max_speed = 1000.f;
 
 private: // Variables
@@ -52,6 +59,7 @@ private: // Variables
     float bar_alpha;
 
     float time_held = 0.f;
+    float animation_time_held = 0.f;
 
     bool is_running = false;
 };

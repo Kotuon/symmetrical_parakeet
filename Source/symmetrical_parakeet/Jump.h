@@ -29,6 +29,16 @@ public: // Functions
     UFUNCTION()
     void ResetJumpMemory();
 
+    // Landing
+    UFUNCTION()
+    void OnLanded( const FHitResult &Hit );
+
+    UFUNCTION( BlueprintCallable )
+    void SetHasPlayedAnimation();
+
+    UFUNCTION( BlueprintCallable )
+    bool GetHasPlayedAnimation() const;
+
 public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "General|Jump Memory" )
     float jump_memory_time = 0.25f;
@@ -40,4 +50,5 @@ private: // Variables
 
     bool has_jumped = false;
     bool jump_memory = false;
+    bool has_played_jump_animation = false;
 };

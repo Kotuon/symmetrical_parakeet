@@ -70,8 +70,6 @@ public: // Variables
     UFall *fall;
     UPROPERTY( VisibleDefaultsOnly, BlueprintReadOnly, Category = "Flight" )
     UFlight *flight;
-    UPROPERTY( VisibleDefaultsOnly, BlueprintReadOnly, Category = "Flight" )
-    USFlight *sflight;
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Camera" )
     float sensitivity = 1.f;

@@ -37,6 +37,8 @@ private: // Functions
     void StartBarAlpha();
     void UpdateBarAlpha();
 
+    float CheckSide( FVector player_position, FVector target_position, FVector range_side );
+
 public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve" )
     UCurveFloat *velocity_curve;

@@ -20,6 +20,8 @@ public: // Functions
     virtual void Start( const FInputActionValue &value );
     virtual void End();
 
+    virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction ) override;
+
 public: // Variables
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "General" )
     float sprint_speed = 800.f;

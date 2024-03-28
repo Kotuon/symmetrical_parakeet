@@ -157,6 +157,8 @@ void UFall::Movement( const FVector &last_input ) {
     const FRotator new_rotation( pitch_rot, yaw_rot, roll_rot );
     parent->AddActorWorldRotation( new_rotation * delta );
 
+    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, "Fall movement." );
+
     ForwardBackwardMovement( last_input );
     LeftRightMovement( last_input );
 }
@@ -171,17 +173,6 @@ void UFall::ForwardBackwardMovement( const FVector &last_input ) {
     if ( ( last_input.Y < 0.f && pitch < 70.f ) || ( last_input.Y > 0.f && pitch > -70.f ) ) {
         pitch_check = true;
     }
-
-    // if ( last_input.Y > 0.f ) {
-    // const FVector fwd = parent->GetActorForwardVector();
-
-    // parent->AddMovementInput( fwd, fall_fwd_speed, false );
-    // FVector result = character_movement->Velocity;
-    // if ( character_movement->Velocity.SizeSquared2D() > FMath::Square( max_fall_fwd_speed ) ) {
-    //     result = FVector::PointPlaneProject( result, FVector::ZeroVector, fwd ) + fwd * max_fall_fwd_speed;
-    //     character_movement->Velocity = result;
-    // }
-    // }
 
     if ( last_input.Y < 0.f ) {
         FVector result = character_movement->Velocity;

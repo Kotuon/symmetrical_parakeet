@@ -57,13 +57,6 @@ void UFlight::Start( const FInputActionValue &value ) {
         if ( character_movement->MovementMode != MOVE_Falling ) {
             const FVector up_velocity = ( parent->gimbal->GetUpVector() ) * ( 100.f );
             character_movement->AddImpulse( up_velocity, true );
-        } else {
-            // FVector result = character_movement->Velocity;
-            // const FVector grav_direction = character_movement->GetGravityDirection();
-            // if ( result.SizeSquared() > FMath::Square( 100.f ) ) {
-            //     result = FVector::PointPlaneProject( result, FVector::ZeroVector, grav_direction ) + grav_direction * 1000.f;
-            //     character_movement->Velocity = result;
-            // }
         }
         character_movement->SetMovementMode( MOVE_Flying );
         curr_speed = character_movement->Velocity.Length();
@@ -87,7 +80,7 @@ void UFlight::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompone
 
     if ( is_running ) {
         time_held += DeltaTime;
-        animation_time_held = FMath::Clamp( animation_time_held + DeltaTime, 0.f, 1.f );
+        animation_time_held = FMath::Clamp( animation_time_held + ( 1.f * DeltaTime ), 0.f, 1.f );
 
         const FVector last_input = parent->GetLastMovementInput();
         const FVector fwd = parent->camera->GetForwardVector();
@@ -95,15 +88,31 @@ void UFlight::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompone
         const float curve_value = velocity_curve->GetFloatValue( FMath::Clamp( time_held / total_curve_time, 0.f, 1.f ) );
 
         curr_speed = max_speed * curve_value;
-        const FVector new_velocity = FMath::VInterpTo( character_movement->Velocity, fwd * curr_speed, DeltaTime, 1.f );
+        const FVector target_velocity = fwd * curr_speed;
+        const FVector new_velocity = FMath::VInterpTo( character_movement->Velocity, target_velocity, DeltaTime, 1.f );
+        const FVector old_velocity = character_movement->Velocity;
         character_movement->Velocity = new_velocity;
 
-        const FQuat new_rotation = FMath::QInterpTo( parent->GetActorRotation().Quaternion(), character_movement->Velocity.Rotation().Quaternion(), DeltaTime, 5.f );
+        const FVector right_amount = new_velocity * parent->camera->GetRightVector();
+        const float roll_amount = right_amount.Length();
+
+        const float side = -CheckSide( parent->GetActorLocation(), target_velocity + parent->GetActorLocation(), old_velocity + parent->GetActorLocation() );
+
+        FRotator velocity_rot = new_velocity.Rotation();
+        velocity_rot.Roll = FMath::GetMappedRangeValueClamped( TRange< float >( -1.f, 1.f ), TRange< float >( -60.f, 60.f ), side );
+
+        const FQuat new_rotation = FMath::QInterpTo( parent->GetActorRotation().Quaternion(), velocity_rot.Quaternion(), DeltaTime, 5.f );
 
         parent->SetActorRotation( new_rotation );
     } else {
         animation_time_held = FMath::Clamp( animation_time_held - ( 2.f * DeltaTime ), 0.f, 1.f );
     }
+}
+
+float UFlight::CheckSide( FVector player_position, FVector target_position, FVector range_side ) {
+    float result = ( target_position.X - player_position.X ) * ( range_side.Y - player_position.Y ) - ( target_position.Y - player_position.Y ) * ( range_side.X - player_position.X );
+
+    return FMath::GetMappedRangeValueClamped( TRange< float >( -52540768.f, 52540768.f ), TRange< float >( -1.f, 1.f ), result );
 }
 
 void UFlight::StartBarAlpha() {

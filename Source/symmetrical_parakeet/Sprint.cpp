@@ -17,15 +17,28 @@ void USprint::BeginPlay() {
 }
 
 void USprint::Start( const FInputActionValue &value ) {
-    if ( value.Get< bool >() ) {
-        is_sprinting = true;
-        character_movement->MaxWalkSpeed = sprint_speed;
-    } else {
+    if ( !value.Get< bool >() ) {
+        return;
+    }
+
+    if ( is_sprinting ) {
         is_sprinting = false;
         character_movement->MaxWalkSpeed = original_walk_speed;
+    } else {
+        is_sprinting = true;
+        character_movement->MaxWalkSpeed = sprint_speed;
     }
 }
 
 void USprint::End() {
     Super::End();
+}
+
+void USprint::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction ) {
+    Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+
+    if ( character_movement->Velocity.Size2D() <= 0.f ) {
+        is_sprinting = false;
+        character_movement->MaxWalkSpeed = original_walk_speed;
+    }
 }

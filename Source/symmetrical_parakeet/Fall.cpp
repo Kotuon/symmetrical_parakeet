@@ -60,7 +60,6 @@ void UFall::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponent
 
 void UFall::MovementModeChanged( ACharacter *Character, EMovementMode PrevMovementMode, uint8 PrevCustomMode ) {
     if ( PrevMovementMode == MOVE_Falling && parent->GetCharacterMovement()->MovementMode == MOVE_Flying ) {
-        air_time = 0.f;
         if ( falling ) {
             Toggle( false );
         }
@@ -112,6 +111,10 @@ void UFall::OnLanded( const FHitResult &Hit ) {
     if ( falling ) {
         Toggle( false );
     }
+
+    FRotator new_rotation = parent->GetActorRotation();
+    new_rotation.Roll = 0.f;
+    parent->SetActorRotation( new_rotation );
 }
 
 bool UFall::GetGoingToLand() const {
@@ -125,11 +128,13 @@ float UFall::GetDistanceFromGround() const {
 void UFall::Toggle( bool should_enable ) {
     if ( should_enable ) {
         falling = true;
+        parent->SetCanWalk( false );
         capsule->SetCapsuleHalfHeight( capsule->GetScaledCapsuleHalfHeight() / 2.f, true );
     } else {
         falling = false;
+        parent->SetCanWalk( true );
         capsule->SetCapsuleHalfHeight( capsule->GetScaledCapsuleHalfHeight() * 2.f, true );
-        parent->SetActorRotation( FRotator( 0., parent->GetActorRotation().Yaw, 0.f ) );
+        // parent->SetActorRotation( FRotator( 0., parent->GetActorRotation().Yaw, 0.f ) );
 
         current_pitch_speed = 0.f;
         current_roll_speed = 0.f;
@@ -152,6 +157,8 @@ void UFall::Movement( const FVector &last_input ) {
     const FRotator new_rotation( pitch_rot, yaw_rot, roll_rot );
     parent->AddActorWorldRotation( new_rotation * delta );
 
+    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, "Fall movement." );
+
     ForwardBackwardMovement( last_input );
     LeftRightMovement( last_input );
 }
@@ -167,29 +174,16 @@ void UFall::ForwardBackwardMovement( const FVector &last_input ) {
         pitch_check = true;
     }
 
-    if ( last_input.Y > 0.f ) {
-        const FVector fwd = parent->GetActorForwardVector();
-
-        character_movement->AddImpulse( fwd * fall_fwd_speed, false );
-        FVector result = character_movement->Velocity;
-        if ( character_movement->Velocity.SizeSquared2D() > FMath::Square( max_fall_fwd_speed ) ) {
-            result = FVector::PointPlaneProject( result, FVector::ZeroVector, fwd ) + fwd * max_fall_fwd_speed;
-            character_movement->Velocity = result;
-        }
-    }
-
     if ( last_input.Y < 0.f ) {
         FVector result = character_movement->Velocity;
-        const FVector grav_direction = character_movement->GetGravityDirection();
-        if ( result.SizeSquared() > FMath::Square( max_pull_back_speed ) ) {
-            result = FVector::PointPlaneProject( result, FVector::ZeroVector, grav_direction ) + grav_direction * max_pull_back_speed;
-            character_movement->Velocity = result;
+        if ( result.Z < -max_pull_back_speed ) {
+            character_movement->Velocity.Z = FMath::FInterpTo( result.Z, -max_pull_back_speed, world->GetDeltaSeconds(), 2.f );
         }
     }
 
     const float new_pitch_speed = pitch_check ? pitch_a : pitch_b;
 
-    current_pitch_speed = FMath::FInterpTo( current_pitch_speed, new_pitch_speed, world->GetDeltaSeconds(), 2.f );
+    current_pitch_speed = FMath::FInterpTo( current_pitch_speed, new_pitch_speed, world->GetDeltaSeconds(), 3.f );
 }
 
 void UFall::LeftRightMovement( const FVector &last_input ) {

@@ -12,6 +12,7 @@
 #include "GameFramework/MovementComponent.h"          //
 #include "Fall.h"                                     // UFall class
 #include "Flight.h"                                   // UFlight class
+#include "SFlight.h"                                  // UFlight class
 
 // Sets default values
 APlayerCharacter::APlayerCharacter( const FObjectInitializer &ObjectInitializer ) : ACharacter( ObjectInitializer ) {
@@ -50,8 +51,15 @@ void APlayerCharacter::BeginPlay() {
 void APlayerCharacter::Tick( float DeltaTime ) {
     Super::Tick( DeltaTime );
 
-    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, character_movement->Velocity.ToString() );
-    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Red, character_movement->GetCurrentAcceleration().ToString() );
+    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, GetActorForwardVector().ToString() );
+    GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Red, GetMesh()->GetForwardVector().ToString() );
+
+    const FVector position = GetActorLocation();
+
+    // FVector mesh_up = ( GetMesh()->GetSocketLocation( "head" ) - GetMesh()->GetSocketLocation( "pelvis" ) ).GetSafeNormal( 0.01f );
+    // FVector mesh_fwd = mesh_up.RotateAngleAxis( -90.f, FVector( 0.f, 1.f, 0.f ) );
+    // DrawDebugLine( GetWorld(), position, position + ( mesh_up * 500.f ), FColor::Green );
+    // DrawDebugLine( GetWorld(), position, position + ( mesh_fwd * 500.f ), FColor::Red );
 }
 
 // Called to bind functionality to input
@@ -84,7 +92,7 @@ void APlayerCharacter::Move( const FInputActionValue &value ) {
     const FVector2D input_value = value.Get< FVector2D >();
     last_movement_input = FVector( input_value.X, input_value.Y, 0.f );
 
-    if ( fall->IsFalling() || flight->IsRunning() ) {
+    if ( !can_walk ) {
         return;
     }
 

@@ -14,6 +14,7 @@ class UAction;
 class UActionManager;
 class UFall;
 class UFlight;
+class USFlight;
 
 UCLASS()
 class SYMMETRICAL_PARAKEET_API APlayerCharacter : public ACharacter {

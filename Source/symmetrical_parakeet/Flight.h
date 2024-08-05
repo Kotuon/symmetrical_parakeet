@@ -9,7 +9,6 @@
 
 class UCharacterMovementComponent;
 class UProgressBar;
-class USpline;
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class SYMMETRICAL_PARAKEET_API UFlight : public UAction {
@@ -25,34 +24,30 @@ public: // Functions
 
     virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction ) override;
 
+    UFUNCTION( BlueprintCallable )
     bool IsRunning() const;
+
+    UFUNCTION( BlueprintCallable )
+    float GetTimeHeld() const;
+
+    UFUNCTION( BlueprintCallable )
+    float GetAnimationTimeHeld() const;
 
 private: // Functions
     void StartBarAlpha();
     void UpdateBarAlpha();
-    void StartRecharge();
+
+    float CheckSide( FVector player_position, FVector target_position, FVector range_side );
 
 public: // Variables
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Spline"  )
-    USplineComponent *spline;
-
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve"  )
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve" )
     UCurveFloat *velocity_curve;
 
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve"  )
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Curve" )
     float total_curve_time = 1.f;
 
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Speed"  )
-    float flight_power = 1000.f;
-
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Speed"  )
-    float max_start_speed = 500.f;
-
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Resource"  )
-    float total_flight_time = 5.f;
-
-    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Resource"  )
-    float recharge_rate = 0.2f;
+    UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Speed" )
+    float max_speed = 1000.f;
 
 private: // Variables
     UCharacterMovementComponent *character_movement;
@@ -61,11 +56,12 @@ private: // Variables
 
     UProgressBar *resource_bar;
 
+    float curr_speed;
+
     float bar_alpha;
 
     float time_held = 0.f;
-    float curr_time_held = 0.f;
+    float animation_time_held = 0.f;
 
     bool is_running = false;
-    bool can_recharge = false;
 };

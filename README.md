@@ -1,5 +1,5 @@
 # Symmetrical Parakeet
-![](https://github.com/Kotuon/super_waddle/blob/main/symmetrical_parakeet_gif.gif)
+![](https://github.com/Kotuon/symmetrical_parakeet/blob/main/symmetrical_parakeet_gif.gif)
 
 ## Table of Contents
 * [Introduction](#introduction)

@@ -5,9 +5,11 @@
 * [Introduction](#introduction)
 * [Technology Used](#technology-used)
 
-## Introduction
+## Overview
 
 A small UE5 project to practice working on character movement and animations.
 
-## Technology Used
+## Technologies
+
 * Unreal Engine 5.3
+* Visual Studio Code

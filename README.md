@@ -10,6 +10,8 @@ It’s part of an ongoing exploration into expressive and physics-aware characte
 ## Technologies
 
 * Unreal Engine 5.3
+* C++
+* (Blueprints
 * Visual Studio Code
 
 ## Features

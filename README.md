@@ -11,7 +11,7 @@ It’s part of an ongoing exploration into expressive and physics-aware characte
 
 * Unreal Engine 5.3
 * C++
-* (Blueprints
+* Blueprints
 * Visual Studio Code
 
 ## Features
